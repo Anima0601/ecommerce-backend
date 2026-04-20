@@ -3,13 +3,8 @@ package com.cg.web;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 
 import com.cg.dto.CartItemDto;
 import com.cg.service.CartService;
@@ -21,23 +16,35 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
+    // ✅ ADD TO CART
     @PostMapping("/add")
-    public String addToCart(@RequestParam Integer custId,
-                           @RequestParam Integer prodId,
-                           @RequestParam int qty) {
+    public ResponseEntity<String> addToCart(
+            @RequestParam Integer custId,
+            @RequestParam Integer prodId,
+            @RequestParam int qty) {
 
-        return cartService.addToCart(custId, prodId, qty);
+        String response = cartService.addToCart(custId, prodId, qty);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    // ✅ GET CART
     @GetMapping("/{custId}")
-    public List<CartItemDto> getCart(@PathVariable Integer custId) {
-        return cartService.getCartByCustomer(custId);
+    public ResponseEntity<List<CartItemDto>> getCart(@PathVariable Integer custId) {
+
+        List<CartItemDto> cart = cartService.getCartByCustomer(custId);
+
+        return new ResponseEntity<>(cart, HttpStatus.OK);
     }
 
+    // ✅ REMOVE FROM CART
     @DeleteMapping("/remove")
-    public String removeFromCart(@RequestParam Integer custId,
-                                @RequestParam Integer prodId) {
+    public ResponseEntity<String> removeFromCart(
+            @RequestParam Integer custId,
+            @RequestParam Integer prodId) {
 
-        return cartService.removeFromCart(custId, prodId);
+        String response = cartService.removeFromCart(custId, prodId);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
