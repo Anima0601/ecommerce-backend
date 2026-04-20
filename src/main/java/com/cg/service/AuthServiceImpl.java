@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.cg.dto.LoginRequest;
 import com.cg.dto.RegisterRequest;
+import com.cg.dto.SuccessDto;
 import com.cg.dto.AuthResponse;
 import com.cg.entity.Authority;
 import com.cg.entity.Customer;
@@ -40,7 +41,9 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public String register(RegisterRequest request) {
+    public SuccessDto register(RegisterRequest request) {
+    	
+    	SuccessDto dto = new SuccessDto();
 
 
         if (userRepo.findByUsername(request.getUsername()).isPresent()) {
@@ -71,7 +74,8 @@ public class AuthServiceImpl implements AuthService {
 
         customerRepo.save(customer);
 
-        return "User registered successfully";
+        dto.setMessage("Registered Successfully");
+		return dto;
     }
 
     @Override

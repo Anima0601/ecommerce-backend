@@ -20,23 +20,27 @@ public class AuthController {
 
     // ✅ REGISTER
     @PostMapping("/register")
-    public String register(@Valid @RequestBody RegisterRequest request) {
-        return authService.register(request);
+    public SuccessDto register(@Valid @RequestBody RegisterRequest request) {
+
+       SuccessDto dto = authService.register(request);
+       return dto;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
+    public SuccessDto login(@RequestBody LoginRequest request, HttpServletResponse response) {
 
         AuthResponse auth = authService.login(request);
+        SuccessDto dto = new SuccessDto();
+        dto.setMessage("Login Successful");
 
         Cookie cookie = new Cookie("token", auth.getToken());
         cookie.setHttpOnly(true);
-        cookie.setSecure(false); // 🔥 keep false for localhost
+        cookie.setSecure(false); 
         cookie.setPath("/");
         cookie.setMaxAge(60 * 60);
 
         response.addCookie(cookie);
 
-        return ResponseEntity.ok("Login successful");
+        return dto;
     }
 }
