@@ -11,7 +11,7 @@ import com.cg.dto.ProductDto;
 import com.cg.entity.Product;
 import com.cg.repo.ProductRepo;
 import com.cg.exception.NotFoundException;
-import com.cg.exception.notAvailableException;
+
 @Service
 public class ProductServiceImpl implements ProductService{
 	

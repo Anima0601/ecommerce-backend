@@ -18,18 +18,22 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    // ✅ REGISTER
     @PostMapping("/register")
-    public SuccessDto register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<SuccessDto> register(@Valid @RequestBody RegisterRequest request) {
 
-       SuccessDto dto = authService.register(request);
-       return dto;
+        SuccessDto dto = authService.register(request);
+
+        return ResponseEntity
+                .status(201) 
+                .body(dto);
     }
 
     @PostMapping("/login")
-    public SuccessDto login(@RequestBody LoginRequest request, HttpServletResponse response) {
+    public ResponseEntity<SuccessDto> login(@RequestBody LoginRequest request,
+                                            HttpServletResponse response) {
 
         AuthResponse auth = authService.login(request);
+
         SuccessDto dto = new SuccessDto();
         dto.setMessage("Login Successful");
 
@@ -41,6 +45,7 @@ public class AuthController {
 
         response.addCookie(cookie);
 
-        return dto;
+        return ResponseEntity
+                .ok(dto); 
     }
 }
