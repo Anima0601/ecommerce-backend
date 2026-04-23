@@ -1,0 +1,57 @@
+<div class="d-flex flex-column justify-content-center align-items-center" style="height: 80vh;">
+  <h2>REGISTER</h2>
+  <form #regFrm="ngForm" class="card shadow p-4" style="width: 400px;" (ngSubmit)="register()">
+    
+    <div class="form-group m-2">
+      <label>Name</label>
+      <input type="text" name="cname" #cname="ngModel" class="form-control" [(ngModel)]="data.name"
+      required pattern="^[A-Za-z ]+$"  maxlength=25>
+      <div class="text-danger" *ngIf="cname.invalid && cname.touched">
+        <div *ngIf="cname.errors?.['required']">Name is required!</div>
+        <div *ngIf="cname.errors?.['pattern']">Only alphabets allowed!</div>
+        <div *ngIf="cname.errors?.['maxlength']">Maximum 25 characters are allowed</div>
+      </div>
+    </div>
+
+    <div class="form-group m-2">
+      <label>Phone Number</label>
+      <input type="text" name="cphone" #cphone="ngModel" class="form-control" [(ngModel)]="data.phoneNo"
+      required pattern="^[0-9]{10}$">
+      <div class="text-danger" *ngIf="cphone.invalid && cphone.touched">
+      <div *ngIf="cphone.errors?.['required']">
+        Phone number is required!
+      </div>
+
+      <div *ngIf="cphone.errors?.['pattern']">
+        Phone number must be exactly 10 digits!
+      </div>
+
+      </div>
+    </div>
+
+    <div class="form-group m-2">
+      <label>Username</label>
+      <input type="text" name="cuname" #cuname="ngModel" class="form-control" [(ngModel)]="data.username" 
+      required pattern="^[A-Za-z].*" maxlength=25>
+      <div class="text-danger" *ngIf="cuname.invalid && cuname.touched">
+        <div *ngIf="cuname.errors?.['required']">Username is required!</div>
+        <div *ngIf="cuname.errors?.['pattern']">Username should start with an alphabet</div>
+        <div *ngIf="cuname.errors?.['maxlength']">Maximum 25 characters are allowed</div>
+      </div>
+    </div>
+
+    <div class="form-group m-2">
+      <label>Password</label>
+      <input type="password" name="cpwd" #cpwd="ngModel" class="form-control" [(ngModel)]="data.password"
+      required minlength=4>
+      <div class="text-danger" *ngIf="cpwd.invalid && cpwd.touched">
+        <div *ngIf="cpwd.errors?.['required']">Password is required!</div>
+        <div *ngIf="cpwd.errors?.['minlength']">Password should be atleast 4 characters!</div>
+      </div>
+    </div>
+  
+    <button [disabled]="regFrm.invalid" type="submit" class="btn btn-info m-2">Register</button>
+
+  </form>
+
+</div>

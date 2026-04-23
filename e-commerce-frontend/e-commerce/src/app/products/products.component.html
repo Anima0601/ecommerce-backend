@@ -1,0 +1,37 @@
+<div class="container mt-3">
+
+  <div class="d-flex justify-content-between mb-3">
+    <h4>PRODUCTS</h4>
+    <button class="btn btn-info" routerLink="/add-product">
+      Add Product
+    </button>
+  </div>
+
+  <div class="row">
+
+    <div class="col-md-4 mb-3" *ngFor="let p of products">
+
+      <div class="card shadow p-3">
+
+        <img 
+          [src]="'assets/images/' + p.prodImage" 
+          class="img-fluid mb-2"
+          style="height:200px; object-fit:contain;"
+        >
+
+        <h5>{{p.prodName}}</h5>
+        <p>{{p.prodDesc}}</p>
+        <p><b>₹ {{p.price}}</b></p>
+
+        <button class="btn btn-info"
+                [routerLink]="['/products', p.prodId]">
+          View Details
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

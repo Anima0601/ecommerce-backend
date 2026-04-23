@@ -1,0 +1,59 @@
+<div class="container mt-4" *ngIf="product">
+
+  <div class="card p-4 shadow">
+
+    <div class="row">
+
+      <!-- IMAGE -->
+      <div class="col-md-5">
+        <img 
+          [src]="'assets/images/' + product.prodImage"
+          class="img-fluid bg-light p-3"
+          style="height:300px; object-fit:contain;"
+        >
+      </div>
+
+      <!-- DETAILS -->
+      <div class="col-md-7">
+
+        <h3>{{product.prodName}}</h3>
+        <p>{{product.prodDesc}}</p>
+
+        <h4>₹ {{product.price}}</h4>
+        <p><b>Stock:</b> {{product.stock}}</p>
+
+        <!-- QUANTITY SELECTOR -->
+        <div class="d-flex align-items-center mt-3">
+
+          <button class="btn btn-outline-dark"
+                  (click)="decrease()">
+            -
+          </button>
+
+          <span class="mx-3 fs-5">{{quantity}}</span>
+
+          <button class="btn btn-outline-dark"
+                  (click)="increase()">
+            +
+          </button>
+
+        </div>
+
+        <button class="btn btn-info mt-3"
+          (click)="addToCart()"
+          [disabled]="product.stock === 0">
+          Add to Cart
+        </button>
+
+    <!-- OUT OF STOCK TEXT -->
+    <p *ngIf="product.stock === 0" class="text-danger mt-2">
+      Out of Stock
+    </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

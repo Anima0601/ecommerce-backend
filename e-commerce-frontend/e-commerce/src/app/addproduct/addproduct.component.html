@@ -1,0 +1,29 @@
+<div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
+
+  <form class="card p-4 shadow" style="width: 400px;" (ngSubmit)="addProduct()">
+
+    <h4 class="text-center mb-3">Add Product</h4>
+
+    <input class="form-control mb-2" placeholder="Name"
+           [(ngModel)]="data.prodName" name="name" required>
+
+    <input class="form-control mb-2" placeholder="Description"
+           [(ngModel)]="data.prodDesc" name="desc" required>
+
+    <input class="form-control mb-2" type="number" placeholder="Price"
+           [(ngModel)]="data.price" name="price" required>
+
+    <input class="form-control mb-2" type="number" placeholder="Stock"
+           [(ngModel)]="data.stock" name="stock" required>
+
+    <input class="form-control mb-2" placeholder="Image filename (ex: iphone.jpg)"
+           [(ngModel)]="data.prodImage" name="image" required>
+
+    <button class="btn btn-success w-100 mt-2">Add</button>
+
+    <div *ngIf="success" class="text-success mt-2">{{msg}}</div>
+    <div *ngIf="!success" class="text-danger mt-2">{{msg}}</div>
+
+  </form>
+
+</div>
