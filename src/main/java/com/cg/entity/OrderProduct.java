@@ -21,6 +21,7 @@ public class OrderProduct {
     @JoinColumn(name = "prod_id", nullable = false)
     private Product product;
 
+
 	public Integer getId() {
 		return id;
 	}

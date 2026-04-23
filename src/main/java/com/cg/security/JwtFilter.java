@@ -26,19 +26,14 @@ public class JwtFilter extends GenericFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        // ✅ Allow CORS preflight
         if ("OPTIONS".equalsIgnoreCase(method)) {
             chain.doFilter(request, response);
             return;
         }
-
-        // ✅ Allow auth APIs
-        if (path.startsWith("/auth")) {
+        if (path.equals("/auth/login") || path.equals("/auth/register")) {
             chain.doFilter(request, response);
             return;
         }
-
-        // 🔥 Get token from cookie
         String token = null;
 
         if (request.getCookies() != null) {

@@ -12,4 +12,5 @@ public interface CartService {
 	
 	String removeFromCart(Integer custId,Integer prodId);
 	
+	String updateQuantity(Integer custId,Integer prodId, int qty);
 }

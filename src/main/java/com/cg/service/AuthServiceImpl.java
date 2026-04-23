@@ -19,6 +19,8 @@ import com.cg.repo.AuthorityRepo;
 import com.cg.repo.CustomerRepo;
 import com.cg.repo.UserRepo;
 import com.cg.security.JwtService;
+
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Service
@@ -93,4 +95,25 @@ public class AuthServiceImpl implements AuthService {
 
         return new AuthResponse(token);
     }
+    @Override
+    public User getCurrentUser()
+    {
+        var authentication= SecurityContextHolder.getContext().getAuthentication();
+        if(authentication==null || !authentication.isAuthenticated())
+            throw new BadRequestException("Unauthorized");;
+        String username=  (String) authentication.getPrincipal();
+        return userRepo.findByUsername(username)
+                .orElseThrow(() -> new BadRequestException("Customer not found"));
+
+    }
+    
+    @Override
+	public Customer getCustomer() 
+	{
+	    User user = getCurrentUser();
+
+	    return customerRepo.findByUserUsername(user.getUsername())
+	            .orElseThrow(() -> new NotFoundException(
+	                    "Customer not found for username: " + user.getUsername()));
+	}
 }

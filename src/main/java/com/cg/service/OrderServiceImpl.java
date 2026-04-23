@@ -11,14 +11,19 @@ import com.cg.entity.CartItem;
 import com.cg.entity.Customer;
 import com.cg.entity.Order;
 import com.cg.entity.OrderProduct;
+import com.cg.entity.Product;
 import com.cg.exception.NotFoundException;
 import com.cg.exception.BadRequestException;
 import com.cg.repo.CartItemRepo;
 import com.cg.repo.CustomerRepo;
 import com.cg.repo.OrderProductRepo;
 import com.cg.repo.OrderRepo;
+import com.cg.repo.ProductRepo;
+
+import jakarta.transaction.Transactional;
 
 @Service
+@Transactional   // 🔥 VERY IMPORTANT
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -32,6 +37,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderProductRepo orderProductRepo;
+
+    @Autowired
+    private ProductRepo productRepo;
 
     // ✅ CREATE ORDER
     @Override
@@ -48,22 +56,34 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = new Order();
         order.setCustomer(customer);
-        order.setOrderStatus("CREATED");
-        order.setOrderDate(java.time.LocalDate.now().toString());
+        order.setOrderStatus("PLACED");
+        order.setOrderDate(java.time.LocalDateTime.now().toString());
 
         double totalAmount = 0;
 
         Order savedOrder = orderRepo.save(order);
 
-        // move cart → order products
         for (CartItem item : cartItems) {
+
+            Product product = item.getProduct();
+
+            // 🔥 STOCK VALIDATION
+            if (item.getQty() > product.getStock()) {
+                throw new BadRequestException(
+                        product.getProdName() + " out of stock"
+                );
+            }
+
+            // 🔻 REDUCE STOCK
+            product.setStock(product.getStock() - item.getQty());
+            productRepo.save(product);
 
             OrderProduct op = new OrderProduct();
             op.setOrder(savedOrder);
-            op.setProduct(item.getProduct());
+            op.setProduct(product);
             op.setQty(item.getQty());
 
-            totalAmount += item.getProduct().getPrice() * item.getQty();
+            totalAmount += product.getPrice() * item.getQty();
 
             orderProductRepo.save(op);
         }
@@ -71,64 +91,60 @@ public class OrderServiceImpl implements OrderService {
         savedOrder.setOrderAmt(totalAmount);
         orderRepo.save(savedOrder);
 
+        // 🧹 CLEAR CART
         cartRepo.deleteAll(cartItems);
 
         return "Order placed successfully";
     }
-
-    // ✅ VIEW ORDERS BY CUSTOMER
+    
     @Override
     public List<OrderDto> getOrdersByCustomer(Integer custId) {
 
         List<Order> orders = orderRepo.findByCustomer_CustId(custId);
 
-        if (orders.isEmpty()) {
-            throw new NotFoundException("No orders found for this customer");
-        }
-
         List<OrderDto> dtoList = new ArrayList<>();
 
         for (Order order : orders) {
-
             OrderDto dto = new OrderDto();
-
             dto.setOrderId(order.getId());
             dto.setOrderAmt(order.getOrderAmt());
             dto.setOrderStatus(order.getOrderStatus());
-
+            dto.setOrderDate(order.getOrderDate());
             dtoList.add(dto);
         }
 
-        return dtoList;
+        return dtoList; // ✅ return empty list instead of exception
     }
-
-    // ✅ VIEW PRODUCTS IN ORDER
+    
     @Override
     public List<OrderDto> getProductsByOrder(Integer orderId) {
 
         List<OrderProduct> list = orderProductRepo.findByOrder_Id(orderId);
 
-        if (list.isEmpty()) {
-            throw new NotFoundException("No products found for this order");
-        }
-
         List<OrderDto> dtoList = new ArrayList<>();
 
         for (OrderProduct op : list) {
 
+            Order order = op.getOrder();
+
             OrderDto dto = new OrderDto();
 
-            dto.setOrderId(orderId);
+            dto.setOrderId(order.getId());
+            dto.setOrderDate(order.getOrderDate());  
+            dto.setOrderStatus(order.getOrderStatus());
+            dto.setOrderAmt(order.getOrderAmt());
+
             dto.setProdName(op.getProduct().getProdName());
             dto.setQty(op.getQty());
+            dto.setProdImage(op.getProduct().getProdImage());
+            dto.setPrice(op.getProduct().getPrice());
 
             dtoList.add(dto);
         }
 
         return dtoList;
     }
-
-    // ❌ CANCEL ORDER
+    
     @Override
     public String cancelOrder(Integer orderId) {
 
@@ -137,6 +153,15 @@ public class OrderServiceImpl implements OrderService {
 
         if ("CANCELLED".equals(order.getOrderStatus())) {
             throw new BadRequestException("Order is already cancelled");
+        }
+
+        // 🔄 RESTORE STOCK
+        List<OrderProduct> items = orderProductRepo.findByOrder_Id(orderId);
+
+        for (OrderProduct op : items) {
+            Product p = op.getProduct();
+            p.setStock(p.getStock() + op.getQty());
+            productRepo.save(p);
         }
 
         order.setOrderStatus("CANCELLED");

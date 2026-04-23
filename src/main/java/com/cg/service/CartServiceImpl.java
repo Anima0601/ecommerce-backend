@@ -28,16 +28,16 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private CustomerRepo customerRepo;
 
-    // 🛒 ADD TO CART
     @Override
-    public String addToCart(Integer prodId, Integer custId, int qty) {
+    public String addToCart(Integer custId, Integer prodId, int qty) {
 
         Customer customer = customerRepo.findById(custId)
                 .orElseThrow(() -> new NotFoundException("Customer not found"));
 
+        System.out.println("Trying to fetch product: " + prodId);
         Product product = productRepo.findById(prodId)
                 .orElseThrow(() -> new NotFoundException("Product not found"));
-
+    
         Optional<CartItem> existingItem =
                 cartItemRepo.findByCustomer_CustIdAndProduct_ProdId(custId, prodId);
 
@@ -67,8 +67,9 @@ public class CartServiceImpl implements CartService {
         List<CartItem> items = cartItemRepo.findByCustomer_CustId(custId);
 
         if (items.isEmpty()) {
-            throw new NotFoundException("Cart is empty");
-        }
+            return(List.of());
+            }
+        
 
         List<CartItemDto> dtoList = new ArrayList<>();
 
@@ -76,9 +77,13 @@ public class CartServiceImpl implements CartService {
 
             CartItemDto dto = new CartItemDto();
 
-            dto.setProdName(item.getProduct().getProdName());
-            dto.setPrice(item.getProduct().getPrice());
-            dto.setQty(item.getQty());
+            Product p= item.getProduct();
+            dto.setProdId(p.getProdId());
+            dto.setProdName(p.getProdName());
+            dto.setPrice(p.getPrice());
+            dto.setStock(p.getStock());
+            dto.setProdImage(p.getProdImage());
+            dto.setQuantity(item.getQty());
 
             dtoList.add(dto);
         }
@@ -97,5 +102,21 @@ public class CartServiceImpl implements CartService {
         cartItemRepo.delete(item);
 
         return "Item removed from cart";
+    }
+    
+    public String updateQuantity(Integer custId, Integer prodId, int qty) {
+
+        CartItem item = cartItemRepo.findByCustomer_CustIdAndProduct_ProdId(custId, prodId)
+                .orElseThrow(() -> new NotFoundException("Item not found"));
+
+        if (qty <= 0) {
+            cartItemRepo.delete(item);
+            return "Item removed";
+        }
+
+        item.setQty(qty);
+        cartItemRepo.save(item);
+
+        return "Quantity updated";
     }
 }

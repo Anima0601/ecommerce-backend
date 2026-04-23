@@ -8,5 +8,5 @@ import com.cg.entity.Customer;
 
 public interface CustomerRepo extends JpaRepository<Customer,Integer> {
 
-
+	public Optional<Customer> findByUserUsername(String username);
 }

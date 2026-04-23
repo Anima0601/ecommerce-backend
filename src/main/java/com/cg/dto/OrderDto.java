@@ -7,6 +7,27 @@ public class OrderDto {
     private String orderStatus;
     private String prodName;
     private int qty;
+    private String prodImage;
+    private double price;
+    private String orderDate;
+	public String getOrderDate() {
+		return orderDate;
+	}
+	public void setOrderDate(String orderDate) {
+		this.orderDate = orderDate;
+	}
+	public String getProdImage() {
+		return prodImage;
+	}
+	public void setProdImage(String prodImage) {
+		this.prodImage = prodImage;
+	}
+	public double getPrice() {
+		return price;
+	}
+	public void setPrice(double price) {
+		this.price = price;
+	}
 	public Integer getOrderId() {
 		return orderId;
 	}

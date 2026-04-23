@@ -16,19 +16,18 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
-    // ✅ ADD TO CART
     @PostMapping("/add")
     public ResponseEntity<String> addToCart(
             @RequestParam Integer custId,
             @RequestParam Integer prodId,
             @RequestParam int qty) {
-
+    	
         String response = cartService.addToCart(custId, prodId, qty);
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // ✅ GET CART
+  
     @GetMapping("/{custId}")
     public ResponseEntity<List<CartItemDto>> getCart(@PathVariable Integer custId) {
 
@@ -37,7 +36,7 @@ public class CartController {
         return new ResponseEntity<>(cart, HttpStatus.OK);
     }
 
-    // ✅ REMOVE FROM CART
+ 
     @DeleteMapping("/remove")
     public ResponseEntity<String> removeFromCart(
             @RequestParam Integer custId,
@@ -46,5 +45,16 @@ public class CartController {
         String response = cartService.removeFromCart(custId, prodId);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    
+    @PutMapping("/update")
+    public ResponseEntity<String> updateQuantity(
+            @RequestParam Integer custId,
+            @RequestParam Integer prodId,
+            @RequestParam int qty) {
+
+        String response = cartService.updateQuantity(custId, prodId, qty);
+
+        return ResponseEntity.ok(response);
     }
 }

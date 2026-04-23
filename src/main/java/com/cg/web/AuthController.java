@@ -1,11 +1,14 @@
 package com.cg.web;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import com.cg.dto.*;
+import com.cg.entity.Customer;
 import com.cg.service.AuthService;
 
 import jakarta.servlet.http.Cookie;
@@ -49,11 +52,30 @@ public class AuthController {
         return ResponseEntity
                 .ok(dto); 
     }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+
+        Cookie cookie = new Cookie("token", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false); 
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+    }
     @GetMapping("/me")
     public ResponseEntity<?> me(Authentication auth) {
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
-        return ResponseEntity.ok(auth.getName()); 
+        Customer customer= authService.getCustomer();
+        return ResponseEntity.ok(
+                Map.of(
+                    "username", auth.getName(),
+                    "custId", customer.getCustId()
+                )
+            );
     }
 }
